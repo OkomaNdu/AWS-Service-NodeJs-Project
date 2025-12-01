@@ -32,6 +32,9 @@ pipeline {
         }
 
         stage('Build and Push docker image') {
+            when {
+              expression { return env.GIT_BRANCH == "master" }
+            }
             steps {
                 withCredentials([
                     usernamePassword(
@@ -47,6 +50,9 @@ pipeline {
             }
         }
         stage('deploy to EC2') {
+            when {
+               expression { return env.GIT_BRANCH == "master" }
+            }
             steps {
                 script {
                     def shellCmd = "bash ./server-cmds.sh ${IMAGE_NAME}"
@@ -63,7 +69,7 @@ pipeline {
 
         stage('commit version update') {
             when {
-                expression { return env.BRANCH_NAME == 'jenkins-ci/cd' }
+                expression { return env.BRANCH_NAME == 'master' }
             }
             steps {
                 script {
